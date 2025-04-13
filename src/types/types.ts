@@ -1,4 +1,4 @@
-interface Project {
+export interface Project {
     projectId: string,
     projectName: string,
     projectDescription: string,
@@ -8,7 +8,7 @@ interface Project {
     projectIssues: Array<Issue>,  
 }
 
-interface Issue {
+export interface Issue {
     issueId: string,  
     projectId: string,  
     issueName: string,
@@ -18,13 +18,13 @@ interface Issue {
     issueStatus: IssueStatus
 }
 
-enum IssueCategory {
+export enum IssueCategory {
     Bug = "Bug",
     Feature = "Feature",
     UI = "UI",
 }
 
-enum IssueStatus {
+export enum IssueStatus {
     Open = "Open",
     Closed = "Closed",
 }

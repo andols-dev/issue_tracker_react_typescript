@@ -1,4 +1,4 @@
-import { Project, Issue, IssueCategory, IssueStatus } from '../types'; 
+import { Project, Issue, IssueCategory, IssueStatus } from '../types/types'; 
 const ProjectList = () => {
     
 }
