@@ -1,9 +1,21 @@
+import {useState, useEffect} from 'react';
 import { Project, Issue, IssueCategory, IssueStatus } from '../types/types'; 
 import { Container,Row,Col,Table, Button } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const ProjectList = () => {
-    
+type Props = {
+    projects: Project[];
+}
+
+const ProjectList = ({projects}:Props) => {
+    const [projectList, setProjectList] = useState(() => {
+        const savedProjects = localStorage.getItem('projectList');
+        return savedProjects ? JSON.parse(savedProjects) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem('projectList', JSON.stringify(projectList));
+    },[projectList]);
     return (
         <Container>
             <Row>
