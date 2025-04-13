@@ -8,9 +8,9 @@ type Props = {
 }
 
 const ProjectList = ({projects}:Props) => {
-    const [projectList, setProjectList] = useState(() => {
+    const [projectList, setProjectList] = useState<Project[]>(() => {
         const savedProjects = localStorage.getItem('projectList');
-        return savedProjects ? JSON.parse(savedProjects) : [];
+        return savedProjects ? JSON.parse(savedProjects) : projects;
     });
 
     useEffect(() => {
@@ -31,19 +31,26 @@ const ProjectList = ({projects}:Props) => {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td className="text-center">Mark</td>
-          <td className="text-center">Otto</td>
-          <td className="text-center">@mdo</td>
-          <td className="text-center">df</td>
-          <td className="text-center">
-  <div className="d-flex justify-content-center flex-wrap gap-2">
-    <Button variant="primary">See details</Button>
-    <Button variant="danger">Delete</Button>
-  </div>
-</td>
+        {projectList.length === 0 && (
+            <tr>
+                <td colSpan={5} className="text-center">No projects available</td>
+            </tr>
+        )}
+        {projectList.map((p: Project)=> (
+            <tr key={p.projectId}>
+                <td className="text-center">{p.projectName}</td>
+                <td className="text-center">{p.projectDescription}</td>
+                <td className="text-center">{p.projectStartDate}</td>
+                <td className="text-center">{p.projectEndDate}</td>
+                <td className="text-center">
+                    <div className="d-flex justify-content-center flex-wrap gap-2">
+                        <Button variant="primary">See details</Button>
+                        <Button variant="danger">Delete</Button>
+                    </div>
+                </td>       
+            </tr>
+        ))}
 
-        </tr>
 
 
 
