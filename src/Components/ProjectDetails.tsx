@@ -1,5 +1,5 @@
 const ProjectDetails = () => {
-    return <p>hello from project details page</p>
+    return <p>hello</p>
 }
 
 export default ProjectDetails;

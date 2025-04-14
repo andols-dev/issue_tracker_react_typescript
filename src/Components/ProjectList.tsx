@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Project, Issue, IssueCategory, IssueStatus } from '../types/types'; 
 import { Container,Row,Col,Table, Button,Modal,Form } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,6 +10,11 @@ type Props = {
 }
 
 const ProjectList = ({projects}:Props) => {
+    const navigate = useNavigate();
+    const goToDetails = (id: string) => {
+      navigate(`/project/${id}`);
+    }
+
     const [projectList, setProjectList] = useState<Project[]>(() => {
         const savedProjects = localStorage.getItem('projectList');
         return savedProjects ? JSON.parse(savedProjects) : projects;
@@ -96,13 +102,21 @@ const ProjectList = ({projects}:Props) => {
 
     return (
         <Container>
+          
             <Row>
                 <Col>
                 <div className="d-flex justify-content-between align-items-center mb-3">
             
-            <Button onClick={() => setShowModal(true)}>Add project</Button>
+            <Button className='mt-5 mb-3' onClick={() => setShowModal(true)}>Add project</Button>
+            
+
           </div>
-                <Table striped bordered hover >
+          <div>            
+            <h3>{projectList.length === 0
+              ? 'No projects'
+              : `${projectList.length} ${projectList.length > 1 ? 'projects' : 'project'} added`  
+            }</h3></div>
+    <Table striped bordered hover >
       <thead>
         <tr>
           <th className="text-center">Project Name</th>
@@ -126,7 +140,7 @@ const ProjectList = ({projects}:Props) => {
                 <td className="text-center">{p.projectEndDate}</td>
                 <td className="text-center">
                     <div className="d-flex justify-content-center flex-wrap gap-2">
-                        <Button variant="primary">See details</Button>
+                        <Button variant="primary" onClick={() => goToDetails(p.projectId)}>See details</Button>
                         <Button variant="danger">Delete</Button>
                     </div>
                 </td>       
