@@ -25,6 +25,12 @@ const ProjectList = ({projects}:Props) => {
         projectStartDate: "",
         projectEndDate: "",
     });
+    const [formErrors, setFormErrors] = useState({
+      projectName: "",
+      projectDescription: "",
+      projectStartDate: "",
+      projectEndDate: "",
+    });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,8 +39,36 @@ const ProjectList = ({projects}:Props) => {
             [name]: value,
         }));
     };  
+    const validateForm = () => {
+      const errors = {
+        projectName: "",
+        projectDescription: "",
+        projectStartDate: "",
+        projectEndDate: "",
+      };
+      let isValid = true;
 
+      if(!formData.projectName.trim()) {
+        errors.projectName = "Project name is needed";
+        isValid = false;
+      }
+      if(!formData.projectDescription.trim()){
+        errors.projectDescription = "Project description is needed";
+        isValid = false;
+      }
+      if(!formData.projectStartDate.trim()) {
+        errors.projectStartDate = "Project start date is needed";
+      }
+      if(!formData.projectEndDate.trim()) {
+        errors.projectEndDate = "Project end date is needed";
+      }
+      setFormErrors(errors);
+      return isValid;
+    }
     const handleAddProject = () => {
+      if(!validateForm()) {
+        return;
+      }
         const newProject: Project = {
             projectId: uuidv4(),
             projectName: formData.projectName,
@@ -50,6 +84,12 @@ const ProjectList = ({projects}:Props) => {
             projectDescription: "",
             projectStartDate: "",
             projectEndDate: "",
+        });
+        setFormErrors({
+          projectName: '',
+          projectDescription: '',
+          projectStartDate: '',
+          projectEndDate: '',
         });
         setShowModal(false);
     };
@@ -115,7 +155,11 @@ const ProjectList = ({projects}:Props) => {
                 name="projectName"
                 value={formData.projectName}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.projectName}
               />
+              <Form.Control.Feedback type='invalid'>
+                {formErrors.projectName}
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -125,7 +169,11 @@ const ProjectList = ({projects}:Props) => {
                 name="projectDescription"
                 value={formData.projectDescription}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.projectDescription}
               />
+              <Form.Control.Feedback type='invalid'>
+                {formErrors.projectDescription}
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -135,7 +183,11 @@ const ProjectList = ({projects}:Props) => {
                 name="projectStartDate"
                 value={formData.projectStartDate}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.projectStartDate}
               />
+               <Form.Control.Feedback type='invalid'>
+                {formErrors.projectStartDate}
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -144,8 +196,12 @@ const ProjectList = ({projects}:Props) => {
                 type="date"
                 name="projectEndDate"
                 value={formData.projectEndDate}
+                isInvalid={!!formErrors.projectEndDate}
                 onChange={handleInputChange}
               />
+              <Form.Control.Feedback type='invalid'>
+                {formErrors.projectEndDate}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         </Modal.Body>
