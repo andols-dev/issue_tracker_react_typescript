@@ -64,9 +64,11 @@ const ProjectList = ({projects}:Props) => {
       }
       if(!formData.projectStartDate.trim()) {
         errors.projectStartDate = "Project start date is needed";
+        isValid = false;
       }
       if(!formData.projectEndDate.trim()) {
         errors.projectEndDate = "Project end date is needed";
+        isValid = false;
       }
       setFormErrors(errors);
       return isValid;
