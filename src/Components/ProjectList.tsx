@@ -125,19 +125,43 @@ const ProjectList = ({projects}:Props) => {
     };
 
     return (
+
+      <>
+      <Container className='mt-5'>
+        
+        <h1 className='text-center'>Issue tracking app</h1>
+  
+
+
+
+     
+      <Form>
+              <Form.Group >
+                <Form.Label className='mb-2'>Search project</Form.Label>
+
+              <Form.Control type='text' placeholder='search project by name' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}></Form.Control>
+              </Form.Group>
+            </Form>
+            <div className="d-flex justify-content-between align-items-center mb-3 mt-2">
+            
+          {filteredProjects.length === 0 && searchTerm.trim() !== "" && projectList.length > 0 &&  (
+            <div className="text-danger">No projects found with the name "{searchTerm}"</div>
+          )}
+
+     
+          
+          </div>
+      </Container>
         <Container>
           
             <Row>
                 <Col>
-                <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex  mb-3">
             
             <Button className='mt-5 mb-3' onClick={() => setShowModal(true)}>Add project</Button>
+            <Button className='mt-5 mb-3 ms-3' onClick={() => setProjectList([])}>Remove all projects</Button>
 
-            <Form>
-              <Form.Group >
-              <Form.Control type='text' placeholder='search project by name' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}></Form.Control>
-              </Form.Group>
-            </Form>
+            
             
 
           </div>
@@ -164,11 +188,7 @@ const ProjectList = ({projects}:Props) => {
                 <td colSpan={5} className="text-center">No projects available</td>
             </tr>
         )}
-            {filteredProjects.length === 0 && searchTerm.trim() !== "" && projectList.length > 0 && (
-        <tr>
-            <td colSpan={5} className="text-center">No projects found with the name "{searchTerm}"</td>
-        </tr>
-    )}
+            
         {(filteredProjects.length > 0 ? filteredProjects : projectList).map((p: Project)=> (
             <tr key={p.projectId}>
                 <td className="text-center">{p.projectName}</td>
@@ -266,6 +286,7 @@ const ProjectList = ({projects}:Props) => {
         </Modal.Footer>
       </Modal>
         </Container>
+        </>
     )
 }
 
