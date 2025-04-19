@@ -14,8 +14,8 @@ export interface Issue {
     issueName: string,
     issueDescription: string,
     issueCreated: string,
-    issueCategory: IssueCategory,
-    issueStatus: IssueStatus
+    issueCategory: IssueCategory.Bug | IssueCategory.Feature | IssueCategory.UI,
+    issueStatus: IssueStatus.Closed | IssueStatus.Open,    
 }
 
 export enum IssueCategory {

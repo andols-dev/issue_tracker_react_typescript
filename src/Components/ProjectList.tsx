@@ -147,6 +147,7 @@ const ProjectList = ({projects}:Props) => {
           {filteredProjects.length === 0 && searchTerm.trim() !== "" && projectList.length > 0 &&  (
             <div className="text-danger">No projects found with the name "{searchTerm}"</div>
           )}
+          
 
      
           
