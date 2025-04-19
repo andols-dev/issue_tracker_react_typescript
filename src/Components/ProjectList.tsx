@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Project, Issue, IssueCategory, IssueStatus } from '../types/types'; 
+import { Project } from '../types/types'; 
 import { Container,Row,Col,Table, Button,Modal,Form } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,6 +24,7 @@ const ProjectList = ({projects}:Props) => {
         localStorage.setItem('projectList', JSON.stringify(projectList));
     },[projectList]);
 
+    
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         projectName: "",
@@ -67,7 +68,7 @@ const ProjectList = ({projects}:Props) => {
         isValid = false;
       }
       if(!formData.projectEndDate.trim()) {
-        errors.projectEndDate = "Project end date is needed";
+        errors.projectEndDate = "Project end date is needed"; 
         isValid = false;
       }
       setFormErrors(errors);
