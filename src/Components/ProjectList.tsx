@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, MouseEventHandler} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project } from '../types/types'; 
 import { Container,Row,Col,Table, Button,Modal,Form } from "react-bootstrap";
@@ -26,6 +26,23 @@ const ProjectList = ({projects}:Props) => {
 
     
     const [showModal, setShowModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredProjects,setFilteredProjects] = useState<Project[]>([]);
+
+    
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+        setFilteredProjects([]);
+        return;
+    }
+
+    const filtered = projectList.filter(proj =>
+        proj.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredProjects(filtered);
+}, [searchTerm, projectList]);
+    
     const [formData, setFormData] = useState({
         projectName: "",
         projectDescription: "",
@@ -74,6 +91,10 @@ const ProjectList = ({projects}:Props) => {
       setFormErrors(errors);
       return isValid;
     }
+    const deleteProject = (id: string) => {
+        const updatedProjects = projectList.filter((p: Project) => p.projectId !== id); 
+        setProjectList(updatedProjects);
+    }
     const handleAddProject = () => {
       if(!validateForm()) {
         return;
@@ -111,6 +132,12 @@ const ProjectList = ({projects}:Props) => {
                 <div className="d-flex justify-content-between align-items-center mb-3">
             
             <Button className='mt-5 mb-3' onClick={() => setShowModal(true)}>Add project</Button>
+
+            <Form>
+              <Form.Group >
+              <Form.Control type='text' placeholder='search project by name' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}></Form.Control>
+              </Form.Group>
+            </Form>
             
 
           </div>
@@ -118,7 +145,9 @@ const ProjectList = ({projects}:Props) => {
             <h3>{projectList.length === 0
               ? 'No projects'
               : `${projectList.length} ${projectList.length > 1 ? 'projects' : 'project'} added`  
-            }</h3></div>
+            }</h3>
+
+            </div>
     <Table striped bordered hover >
       <thead>
         <tr>
@@ -135,7 +164,12 @@ const ProjectList = ({projects}:Props) => {
                 <td colSpan={5} className="text-center">No projects available</td>
             </tr>
         )}
-        {projectList.map((p: Project)=> (
+            {filteredProjects.length === 0 && searchTerm.trim() !== "" && projectList.length > 0 && (
+        <tr>
+            <td colSpan={5} className="text-center">No projects found with the name "{searchTerm}"</td>
+        </tr>
+    )}
+        {(filteredProjects.length > 0 ? filteredProjects : projectList).map((p: Project)=> (
             <tr key={p.projectId}>
                 <td className="text-center">{p.projectName}</td>
                 <td className="text-center">{p.projectDescription}</td>
@@ -144,7 +178,7 @@ const ProjectList = ({projects}:Props) => {
                 <td className="text-center">
                     <div className="d-flex justify-content-center flex-wrap gap-2">
                         <Button variant="primary" onClick={() => goToDetails(p.projectId)}>See details</Button>
-                        <Button variant="danger">Delete</Button>
+                        <Button variant="danger" onClick={() => deleteProject(p.projectId)}>Delete</Button>
                     </div>
                 </td>       
             </tr>
