@@ -137,7 +137,7 @@ const ProjectList = ({projects}:Props) => {
               onChange={(e) => setSearchTerm(e.target.value)} 
               className="shadow-sm"
             />
-            <Button variant="outline-primary" className="shadow-sm">Search</Button>
+            
           </InputGroup>
         </Form>
 
