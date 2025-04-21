@@ -153,7 +153,8 @@ const ProjectList = ({projects}:Props) => {
           <Col>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <Button className='btn btn-primary shadow-sm' onClick={() => setShowModal(true)}>Add Project</Button>
-              <Button className='btn btn-danger shadow-sm' onClick={() => setProjectList([])}>Remove All Projects</Button>
+              {projectList.length > 0 && <Button className='btn btn-danger shadow-sm' onClick={() => setProjectList([])}>Remove All Projects</Button> }
+         
             </div>
 
             <h3 className="text-muted">
