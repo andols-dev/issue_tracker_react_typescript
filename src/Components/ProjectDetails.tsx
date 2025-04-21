@@ -1,74 +1,44 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Issue, Project } from "../types/types";
 import { Button, Card, Container, Modal, Form, Badge } from "react-bootstrap";
 import { IssueCategory, IssueStatus } from "../types/types";
 import { v4 as uuidv4 } from "uuid";
-import ProjectList from "./ProjectList";
+
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
-  const projects: Project[] = JSON.parse(
-    localStorage.getItem("projectList") || "[]"
-  );
+  const projects: Project[] = JSON.parse(localStorage.getItem("projectList") || "[]");
 
   const project = projects.find((proj) => proj.projectId === id);
-  const [projectIssues, setProjectIssues] = useState<Issue[]>(
-    project ? project.projectIssues : []
-  );
-  
+  const [projectIssues, setProjectIssues] = useState<Issue[]>(project ? project.projectIssues : []);
   const [formData, setFormData] = useState({
     issueName: "",
     issueDescription: "",
     issueCategory: "",
     issueStatus: "",
   });
-  const removeIssues = () => {
-    console.log("Remove all issues clicked");
-    
-      if (project) {
-        project.projectIssues = [];
-        setProjectIssues([]);
-      }
-      localStorage.setItem("projectList", JSON.stringify(projects));
-      console.log("Updated projects in localStorage:", projects);
 
-  }
-  const closingModal = () => {
-    setShowModal(false);
-    setValidated(false);
-  }
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | HTMLSelectElement>
+  ): void => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     event.stopPropagation();
-    console.log("Form submitted");
 
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      console.log("Form is invalid");
       setValidated(true);
       return;
     }
 
-    if (!project) {
-      console.error("Project not found");
-      return;
-    }
-
-    console.log("Form data:", formData);
+    if (!project) return;
 
     const newIssue: Issue = {
       issueId: uuidv4(),
@@ -81,43 +51,34 @@ const ProjectDetails = () => {
     };
 
     project.projectIssues.push(newIssue);
-    setProjectIssues([...project.projectIssues]); 
-
-    /*  const updatedProjects = projects.map((proj) =>
-        proj.projectId === project.projectId ? project : proj
-    ); */
-
+    setProjectIssues([...project.projectIssues]);
     localStorage.setItem("projectList", JSON.stringify(projects));
-    console.log("Updated projects in localStorage:", projects);
 
     setShowModal(false);
-    setFormData({
-      issueName: "",
-      issueDescription: "",
-      issueCategory: "",
-      issueStatus: "",
-    });
+    setFormData({ issueName: "", issueDescription: "", issueCategory: "", issueStatus: "" });
   };
 
-  // Adding a new issue to the project's issue list for testing purposes
-  /* project?.projectIssues.push({
-    issueId: "1",
-    projectId: id || "",
-    issueName: "Issue 1",
-    issueDescription: "Issue descrasdasdiption",
-    issueCreated: new Date().toISOString(),
-    issueCategory: IssueCategory.Bug,
-    issueStatus: IssueStatus.Open
-});
-project?.projectIssues.push({
-    issueId: "2",
-    projectId: id || "",
-    issueName: "Issue 2",
-    issueDescription: "Issue descrasdfdsfsdasdiption",
-    issueCreated: new Date().toISOString(),
-    issueCategory: IssueCategory.Feature,
-    issueStatus: IssueStatus.Open
-}); */
+  const removeIssues = (): void => {
+    if (!project) return;
+
+    project.projectIssues = [];
+    setProjectIssues([]);
+    localStorage.setItem("projectList", JSON.stringify(projects));
+  };
+
+  const deleteIssue = (issueId: string): void => {
+    if (!project) return;
+
+    const updatedIssues = project.projectIssues.filter((issue) => issue.issueId !== issueId);
+    project.projectIssues = updatedIssues;
+    setProjectIssues(updatedIssues);
+    localStorage.setItem("projectList", JSON.stringify(projects));
+  };
+
+  const closingModal = (): void => {
+    setShowModal(false);
+    setValidated(false);
+  };
 
   if (!project) {
     return (
@@ -127,39 +88,18 @@ project?.projectIssues.push({
             <p className="text-danger fw-bold">Project not found</p>
           </Card.Body>
         </Card>
-        <Button
-          variant="secondary"
-          className="mt-3 shadow-sm"
-          onClick={() => window.history.back()}
-        >
+        <Button variant="secondary" className="mt-3 shadow-sm" onClick={() => window.history.back()}>
           Back to Project List
         </Button>
       </Container>
     );
   }
 
-  function deleteIssue(issueId: string): void {
-    if (!project) {
-      console.error("Project not found");
-      return;
-    }
-
-    const updatedIssues = project.projectIssues.filter(
-      (issue) => issue.issueId !== issueId
-    );
-
-    project.projectIssues = updatedIssues;
-    setProjectIssues(updatedIssues);
-
-    localStorage.setItem("projectList", JSON.stringify(projects));
-    console.log(`Issue with ID ${issueId} deleted successfully.`);
-  }
-
   return (
     <Container className="mt-5">
       <Card className="shadow-sm border-0">
         <Card.Header as="h3" className="bg-primary text-white">
-          {project?.projectName}
+          {project.projectName}
         </Card.Header>
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-4">
@@ -182,13 +122,15 @@ project?.projectIssues.push({
           </div>
 
           <div className="d-flex justify-content-end mb-3">
-            {projectIssues.length > 0 && <Button onClick={removeIssues}>Remove all issues</Button>  }
+            {projectIssues.length > 0 && (
+              <Button variant="danger" onClick={removeIssues}>
+                Remove all issues
+              </Button>
+            )}
           </div>
-          <h4 className="mt-4">
-            {projectIssues.length > 0 ? "Project Issues" : "No Issues"}
-          </h4>
 
-          {project.projectIssues.length > 0 && (
+          <h4 className="mt-4">{projectIssues.length > 0 ? "Project Issues" : "No Issues"}</h4>
+          {projectIssues.length > 0 && (
             <div className="list-group">
               {projectIssues.map((issue) => (
                 <div
@@ -215,7 +157,13 @@ project?.projectIssues.push({
                       {issue.issueCategory}
                     </Badge>
                   </p>
-                  <Button onClick={() => deleteIssue(issue.issueId)}>Delete</Button>
+                  <Button
+                    variant="danger"
+                    className="mt-2 shadow-sm"
+                    onClick={() => deleteIssue(issue.issueId)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               ))}
             </div>
