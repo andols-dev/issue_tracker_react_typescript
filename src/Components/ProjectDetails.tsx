@@ -4,6 +4,7 @@ import { Issue, Project } from "../types/types";
 import { Button, Card, Container, Modal, Form, Badge } from "react-bootstrap";
 import { IssueCategory, IssueStatus } from "../types/types";
 import { v4 as uuidv4 } from "uuid";
+import ProjectList from "./ProjectList";
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,12 +15,31 @@ const ProjectDetails = () => {
   );
 
   const project = projects.find((proj) => proj.projectId === id);
+  const [projectIssues, setProjectIssues] = useState<Issue[]>(
+    project ? project.projectIssues : []
+  );
+  
   const [formData, setFormData] = useState({
     issueName: "",
     issueDescription: "",
     issueCategory: "",
     issueStatus: "",
   });
+  const removeIssues = () => {
+    console.log("Remove all issues clicked");
+    
+      if (project) {
+        project.projectIssues = [];
+        setProjectIssues([]);
+      }
+      localStorage.setItem("projectList", JSON.stringify(projects));
+      console.log("Updated projects in localStorage:", projects);
+
+  }
+  const closingModal = () => {
+    setShowModal(false);
+    setValidated(false);
+  }
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -61,6 +81,7 @@ const ProjectDetails = () => {
     };
 
     project.projectIssues.push(newIssue);
+    setProjectIssues([...project.projectIssues]); 
 
     /*  const updatedProjects = projects.map((proj) =>
         proj.projectId === project.projectId ? project : proj
@@ -117,6 +138,23 @@ project?.projectIssues.push({
     );
   }
 
+  function deleteIssue(issueId: string): void {
+    if (!project) {
+      console.error("Project not found");
+      return;
+    }
+
+    const updatedIssues = project.projectIssues.filter(
+      (issue) => issue.issueId !== issueId
+    );
+
+    project.projectIssues = updatedIssues;
+    setProjectIssues(updatedIssues);
+
+    localStorage.setItem("projectList", JSON.stringify(projects));
+    console.log(`Issue with ID ${issueId} deleted successfully.`);
+  }
+
   return (
     <Container className="mt-5">
       <Card className="shadow-sm border-0">
@@ -136,16 +174,23 @@ project?.projectIssues.push({
                 <strong>End Date:</strong> {project.projectEndDate}
               </p>
             </div>
-            <Button variant="success" className="shadow-sm" onClick={() => setShowModal(true)}>
-              Add Issue
-            </Button>
+            <div className="d-flex justify-content-end">
+              <Button variant="success" className="shadow-sm" onClick={() => setShowModal(true)}>
+                Add Issue
+              </Button>
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-end mb-3">
+            {projectIssues.length > 0 && <Button onClick={removeIssues}>Remove all issues</Button>  }
           </div>
           <h4 className="mt-4">
-            {project.projectIssues.length > 0 ? "Project Issues" : "No Issues"}
+            {projectIssues.length > 0 ? "Project Issues" : "No Issues"}
           </h4>
+
           {project.projectIssues.length > 0 && (
             <div className="list-group">
-              {project.projectIssues.map((issue) => (
+              {projectIssues.map((issue) => (
                 <div
                   key={issue.issueId}
                   className="list-group-item list-group-item-action mb-2 shadow-sm"
@@ -170,6 +215,7 @@ project?.projectIssues.push({
                       {issue.issueCategory}
                     </Badge>
                   </p>
+                  <Button onClick={() => deleteIssue(issue.issueId)}>Delete</Button>
                 </div>
               ))}
             </div>
@@ -183,7 +229,7 @@ project?.projectIssues.push({
       >
         Back to Project List
       </Button>
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={closingModal}>
         <Modal.Header closeButton>
           <Modal.Title>Add Issue</Modal.Title>
         </Modal.Header>
@@ -259,7 +305,7 @@ project?.projectIssues.push({
               <Button type="submit" variant="primary" className="me-2 shadow-sm">
                 Submit
               </Button>
-              <Button variant="secondary" className="shadow-sm" onClick={() => setShowModal(false)}>
+              <Button variant="secondary" className="shadow-sm" onClick={closingModal}>
                 Cancel
               </Button>
             </div>
