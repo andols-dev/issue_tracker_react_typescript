@@ -30,6 +30,25 @@ const ProjectList = ({ projects }: Props) => {
     projectStartDate: "",
     projectEndDate: "",
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  
+  const closingModal = (): void => {
+    setShowModal(false);
+    setFormData({
+      projectName: "",
+      projectDescription: "",
+      projectStartDate: "",
+      projectEndDate: "",
+    });
+    setFormErrors({ 
+      projectName: "",
+      projectDescription: "",
+      projectStartDate: "",
+      projectEndDate: "",
+    });
+    
+  };
 
   useEffect(() => {
     localStorage.setItem('projectList', JSON.stringify(projectList));
@@ -118,6 +137,37 @@ const ProjectList = ({ projects }: Props) => {
     setProjectList(updatedProjects);
   };
 
+const handleEditProject = (project: Project): void =>
+{
+  
+
+  setIsEditing(true);
+  setEditingProject(project);
+  setFormData({
+    projectName: project.projectName,
+    projectDescription: project.projectDescription,
+    projectStartDate: project.projectStartDate,
+    projectEndDate: project.projectEndDate,
+  });
+}
+const saveEditedProject = (): void =>
+{
+  const updatedProjects = projectList.map((proj) =>
+    proj.projectId === editingProject?.projectId
+      ? { ...proj, ...formData }
+      : proj
+  );
+  setProjectList(updatedProjects);
+  setIsEditing(false);
+  setEditingProject(null);
+  setFormData({
+    projectName: "",
+    projectDescription: "",
+    projectStartDate: "",
+    projectEndDate: "",
+  });
+}
+
   return (
     <>
       <Container className="mt-5">
@@ -181,38 +231,57 @@ const ProjectList = ({ projects }: Props) => {
                     </td>
                   </tr>
                 )}
-                {(filteredProjects.length > 0 ? filteredProjects : projectList).map((p: Project) => (
-                  <tr key={p.projectId}>
-                    <td className="text-center">{p.projectName}</td>
-                    <td className="text-center">{p.projectDescription}</td>
-                    <td className="text-center">{p.projectStartDate}</td>
-                    <td className="text-center">{p.projectEndDate}</td>
-                    <td className="text-center">
-                      <div className="d-flex justify-content-center flex-wrap gap-2">
-                        <Button
-                          variant="outline-primary"
-                          className="shadow-sm"
-                          onClick={() => goToDetails(p.projectId)}
-                        >
-                          See Details
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          className="shadow-sm"
-                          onClick={() => deleteProject(p.projectId)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {
+                  isEditing && editingProject ? ( 
+                    <tr>
+                      <td ><Form.Control type='text' name='projectName' value={formData.projectName}  onChange={handleInputChange} ></Form.Control></td>
+                      <td><Form.Control type='text' name='projectDescription' value={formData.projectDescription}  onChange={handleInputChange} ></Form.Control></td>
+                      <td><Form.Control type='date' name='projectStartDate' value={formData.projectStartDate}  onChange={handleInputChange} ></Form.Control></td>
+                      <td><Form.Control type='date' name='projectEndDate' value={formData.projectEndDate}  onChange={handleInputChange} ></Form.Control></td>
+                      <td><div className="d-flex justify-content-center flex-wrap gap-2">
+                        <Button onClick={saveEditedProject}>Save</Button>
+                         
+                        <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+                        
+                      </div></td>
+                    </tr>
+                  )
+                  : ((filteredProjects.length > 0 ? filteredProjects : projectList).map((p: Project) => (
+                    <tr key={p.projectId}>
+                      <td className="text-center">{p.projectName}</td>
+                      <td className="text-center">{p.projectDescription}</td>
+                      <td className="text-center">{p.projectStartDate}</td>
+                      <td className="text-center">{p.projectEndDate}</td>
+                      <td className="text-center">
+                        <div className="d-flex justify-content-center flex-wrap gap-2">
+                          <Button
+                            variant="outline-primary"
+                            className="shadow-sm"
+                            onClick={() => goToDetails(p.projectId)}
+                          >
+                            See Details
+                          </Button>
+                          
+                          <Button onClick={() => handleEditProject(p)}>Edit project</Button>
+                          <Button
+                            variant="outline-danger"
+                            className="shadow-sm"
+                            onClick={() => deleteProject(p.projectId)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )))
+                }
+
               </tbody>
             </Table>
           </Col>
         </Row>
 
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal show={showModal} onHide={closingModal}>
           <Modal.Header closeButton>
             <Modal.Title>Add New Project</Modal.Title>
           </Modal.Header>
@@ -280,7 +349,7 @@ const ProjectList = ({ projects }: Props) => {
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
+            <Button variant="secondary" onClick={closingModal}>
               Cancel
             </Button>
             <Button variant="success" onClick={handleAddProject}>
