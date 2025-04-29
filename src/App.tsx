@@ -1,5 +1,5 @@
 import ProjectList from "./Components/ProjectList"
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProjectDetails from "./Components/ProjectDetails";

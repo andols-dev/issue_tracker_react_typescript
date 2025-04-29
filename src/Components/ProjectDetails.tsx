@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useState } from "react";
 import { Issue, Project } from "../types/types";
 import { Button, Card, Container, Modal, Form, Badge } from "react-bootstrap";
